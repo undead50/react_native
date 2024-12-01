@@ -2,6 +2,11 @@
   "expo": {
     "name": "my",
     "slug": "my",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "0f844ca5-6dfc-43a8-8e01-ea2ab1fe6136"
+      }
+    }
   }
 }
