@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { Appbar } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons'; // Icons for the Bottom Navigation
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Platform,
+  Dimensions,
+} from 'react-native';
+import { LineChart, BarChart } from 'react-native-chart-kit';
+import { MaterialIcons } from '@expo/vector-icons';
+
+const screenWidth = Dimensions.get('window').width;
 
 const AdminLayout = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -12,7 +21,51 @@ const AdminLayout = ({ onLogout }) => {
         return (
           <View style={styles.content}>
             <Text style={styles.title}>Dashboard</Text>
-            <Text>Welcome to your enterprise dashboard!</Text>
+            <Text style={styles.subtitle}>Overview</Text>
+
+            {/* Graph */}
+            <LineChart
+              data={{
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [
+                  {
+                    data: [20, 45, 28, 80, 99, 43],
+                  },
+                ],
+              }}
+              width={screenWidth * 0.9} // Adjust width
+              height={220}
+              yAxisLabel="$"
+              yAxisSuffix="k"
+              chartConfig={{
+                backgroundColor: '#f5f5f5',
+                backgroundGradientFrom: '#ffffff',
+                backgroundGradientTo: '#ffffff',
+                decimalPlaces: 2,
+                color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+              }}
+              style={styles.chart}
+            />
+
+            {/* Cards */}
+            <View style={styles.cardContainer}>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Revenue</Text>
+                <Text style={styles.cardValue}>$15,230</Text>
+              </View>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Users</Text>
+                <Text style={styles.cardValue}>2,450</Text>
+              </View>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Tasks</Text>
+                <Text style={styles.cardValue}>120</Text>
+              </View>
+            </View>
           </View>
         );
       case 'profile':
@@ -39,16 +92,29 @@ const AdminLayout = ({ onLogout }) => {
 
   return (
     <View style={styles.container}>
-      {/* App Bar */}
-      <Appbar.Header style={styles.appBar}>
-        <Appbar.Action icon="bell" onPress={onLogout} color="black" />
-        <Appbar.Action icon="logout" onPress={onLogout} color="black" />
-      </Appbar.Header>
+      {/* Custom App Bar */}
+      <View style={styles.appBar}>
+        <TouchableOpacity onPress={() => alert('Menu')} style={styles.icon}>
+          <MaterialIcons name="menu" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.appTitle}>Admin Panel</Text>
+        <View style={styles.appBarActions}>
+          <TouchableOpacity
+            onPress={() => alert('Notifications')}
+            style={styles.icon}
+          >
+            <MaterialIcons name="notifications" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onLogout} style={styles.icon}>
+            <MaterialIcons name="logout" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       {/* Main Content */}
       <View style={styles.mainContent}>{renderContent()}</View>
 
-      {/* Custom Bottom Navigation */}
+      {/* Bottom Navigation */}
       <View style={styles.bottomNavigation}>
         <TouchableOpacity
           style={styles.navItem}
@@ -114,6 +180,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
+  appBar: {
+    height: Platform.OS === 'ios' ? 80 : 70,
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingTop: Platform.OS === 'ios' ? 30 : 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  appTitle: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+  },
+  appBarActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    padding: 10,
+  },
   mainContent: {
     flex: 1,
     justifyContent: 'center',
@@ -128,42 +221,60 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  subtitle: {
+    fontSize: 18,
+    marginVertical: 10,
+  },
+  chart: {
+    marginVertical: 20,
+    borderRadius: 16,
+  },
+  cardContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 20,
+  },
+  card: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    width: '30%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  cardTitle: {
+    fontSize: 14,
+    color: '#666',
+  },
+  cardValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
   bottomNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    paddingVertical: 10,
+    paddingVertical: Platform.OS === 'ios' ? 30 : 10,
     borderTopWidth: 1,
     borderTopColor: '#ddd',
   },
   navItem: {
     alignItems: 'center',
   },
-  appBar: {
-    height: 35, // Reduced height
-    backgroundColor: 'white', // Custom background color
-    elevation: 2, // Shadow for depth
-  },
   navText: {
     fontSize: 12,
     color: '#666',
-    marginTop: 4,
+    marginTop: 10,
   },
   activeText: {
     color: '#007bff',
-  },
-  logoutButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#ff5252',
-    borderRadius: 5,
-  },
-  logoutText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 
